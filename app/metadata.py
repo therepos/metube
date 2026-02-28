@@ -47,11 +47,10 @@ def _strip_and_write_id3(filepath: str, title: str | None, artist: str | None, a
     """Handle MP3 files using ID3 tags."""
     try:
         tags = ID3(filepath)
+        tags.delete(filepath)
     except ID3NoHeaderError:
-        tags = ID3()
+        pass
 
-    # Strip all existing tags
-    tags.delete(filepath)
     tags = ID3()
 
     if title:
@@ -65,7 +64,7 @@ def _strip_and_write_id3(filepath: str, title: str | None, artist: str | None, a
         tags.add(APIC(
             encoding=3,
             mime=mime,
-            type=3,  # Cover (front)
+            type=3,
             desc='Cover',
             data=cover_data
         ))
@@ -79,24 +78,22 @@ def _strip_and_write_mp4(filepath: str, title: str | None, artist: str | None, a
     audio = MP4(filepath)
 
     # Strip all existing tags
-    audio.delete()
-    audio.tags = None
+    audio.clear()
     audio.save()
 
     # Re-open and write new tags
     audio = MP4(filepath)
-    audio.add_tags()
 
     if title:
-        audio.tags['\xa9nam'] = [title]
+        audio['\xa9nam'] = [title]
     if artist:
-        audio.tags['\xa9ART'] = [artist]
+        audio['\xa9ART'] = [artist]
     if album:
-        audio.tags['\xa9alb'] = [album]
+        audio['\xa9alb'] = [album]
     if cover_data:
         mime = _detect_mime_type(cover_data)
         img_format = MP4Cover.FORMAT_PNG if 'png' in mime else MP4Cover.FORMAT_JPEG
-        audio.tags['covr'] = [MP4Cover(cover_data, imageformat=img_format)]
+        audio['covr'] = [MP4Cover(cover_data, imageformat=img_format)]
 
     audio.save()
     log.info(f"MP4 metadata written to {filepath}")
