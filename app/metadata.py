@@ -2,7 +2,7 @@ import os
 import logging
 import base64
 from mutagen import File as MutagenFile
-from mutagen.id3 import ID3, TIT2, TPE1, TALB, APIC, ID3NoHeaderError
+from mutagen.id3 import ID3, TIT2, TPE1, TPE2, TALB, APIC, ID3NoHeaderError
 from mutagen.mp4 import MP4, MP4Cover
 from mutagen.oggopus import OggOpus
 from mutagen.oggvorbis import OggVorbis
@@ -57,6 +57,7 @@ def _strip_and_write_id3(filepath: str, title: str | None, artist: str | None, a
         tags.add(TIT2(encoding=3, text=[title]))
     if artist:
         tags.add(TPE1(encoding=3, text=[artist]))
+        tags.add(TPE2(encoding=3, text=[artist]))
     if album:
         tags.add(TALB(encoding=3, text=[album]))
     if cover_data:
@@ -64,7 +65,7 @@ def _strip_and_write_id3(filepath: str, title: str | None, artist: str | None, a
         tags.add(APIC(
             encoding=3,
             mime=mime,
-            type=3,
+            type=3,  # Cover (front)
             desc='Cover',
             data=cover_data
         ))
@@ -88,6 +89,7 @@ def _strip_and_write_mp4(filepath: str, title: str | None, artist: str | None, a
         audio['\xa9nam'] = [title]
     if artist:
         audio['\xa9ART'] = [artist]
+        audio['aART'] = [artist]
     if album:
         audio['\xa9alb'] = [album]
     if cover_data:
@@ -117,6 +119,7 @@ def _strip_and_write_ogg(filepath: str, title: str | None, artist: str | None, a
         audio['title'] = [title]
     if artist:
         audio['artist'] = [artist]
+        audio['albumartist'] = [artist]
     if album:
         audio['album'] = [album]
     if cover_data:
@@ -150,6 +153,7 @@ def _strip_and_write_flac(filepath: str, title: str | None, artist: str | None, 
         audio['title'] = [title]
     if artist:
         audio['artist'] = [artist]
+        audio['albumartist'] = [artist]
     if album:
         audio['album'] = [album]
     if cover_data:
