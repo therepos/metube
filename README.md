@@ -1,6 +1,6 @@
 ## Usage
 
-Modified metube
+Modified metube that offers user custom input for filename, artist name, album name and cover image.
 
 ## Structure
 
