@@ -4,6 +4,7 @@ Modified metube
 
 ## Structure
 
+```
 METUBE [GITHUB]
 ├── .github
 ├── .vscode
@@ -20,6 +21,7 @@ METUBE [GITHUB]
 ├── README.md
 ├── screenshot.gif
 └── uv.lock
+```
 
 ## Reference
 
