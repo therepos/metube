@@ -4,28 +4,29 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+permissions:
+  contents: write
+
 jobs:
-  update-yt-dlp :
+  update-yt-dlp:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.AUTOUPDATE_PAT }}
-      -
-        name: Set up Python
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      -
-        name: Install uv
+
+      - name: Install uv
         uses: astral-sh/setup-uv@v7
-      -
-        name: Update yt-dlp
+
+      - name: Update yt-dlp
         run: |
           uv sync --locked
-          # Check if yt-dlp has updates available
           LATEST_VERSION=$(uv pip list --outdated --format json | jq -r '.[] | select(.name == "yt-dlp") | .latest_version')
           CURRENT_VERSION=$(uv pip list --format json | jq -r '.[] | select(.name == "yt-dlp") | .version')
           if [ -n "$LATEST_VERSION" ] && [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
